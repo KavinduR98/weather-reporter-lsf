@@ -5,12 +5,14 @@ function App() {
   const [data, setData] = useState(null);
   const [location, setLocation] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const api_key = import.meta.env.VITE_WEATHER_API_KEY;
   const api_url = import.meta.env.VITE_API_URL;
 
   const fetchData = async () => {
     setError("");
+    setLoading(true);
     try {
       const response = await axios.get(`${api_url}?key=${api_key}&q=${location}&days=1`);
       console.log(response.data);
@@ -20,6 +22,8 @@ function App() {
       console.error("Error fetching weather data:", error);
       setError("City not found or something went wrong. Please try again.");
       setData(null);
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -49,8 +53,16 @@ function App() {
           </p>
         )}
 
+         {/* ⏳ Spinner when loading */}
+        {loading && (
+          <div className="mt-6">
+            <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+            <p className="mt-2 text-sm text-white/70">Loading weather...</p>
+          </div>
+        )}
+
         {/* Weather data display */}
-        {data && (
+        {!loading && data && (
           <div className="w-full max-w-md mt-8 bg-white/10 rounded-xl p-6 shadow-lg backdrop-blur-sm">
             <>
               <div className="text-center">
