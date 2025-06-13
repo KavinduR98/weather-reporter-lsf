@@ -4,22 +4,21 @@ import axios from "axios";
 function App() {
   const [data, setData] = useState(null);
   const [location, setLocation] = useState("");
+  const [error, setError] = useState("");
 
   const api_key = import.meta.env.VITE_WEATHER_API_KEY;
   const api_url = import.meta.env.VITE_API_URL;
 
   const fetchData = async () => {
-    setData(null);
-
+    setError("");
     try {
-      const response = await axios.get(
-        `${api_url}?key=${api_key}&q=${location}&days=1`
-      );
+      const response = await axios.get(`${api_url}?key=${api_key}&q=${location}&days=1`);
       console.log(response.data);
       setData(response.data);
+      setError("");
     } catch (error) {
       console.error("Error fetching weather data:", error);
-      alert("City not found or something went wrong. Please try again.");
+      setError("City not found or something went wrong. Please try again.");
       setData(null);
     }
   };
@@ -42,20 +41,22 @@ function App() {
         type="text"
         className="w-full max-w-md px-4 py-3 rounded-full bg-white/10 border border-white/40 placeholder-white text-white focus:outline-none focus:ring-2 focus:ring-white"
       />
+      {error && (
+        <p className="text-red-300 bg-red-800/20 border border-red-500 rounded-md p-3 mt-4 text-center max-w-md">
+          {error}
+        </p>
+      )}
 
-      <div className="w-full max-w-md mt-8 bg-white/10 rounded-xl p-6 shadow-lg backdrop-blur-sm">
-        {/* Weather data display */}
-        {data && (
+      {/* Weather data display */}
+      {data && (
+        <div className="w-full max-w-md mt-8 bg-white/10 rounded-xl p-6 shadow-lg backdrop-blur-sm">
           <>
             <div className="text-center">
               <h2 className="text-3xl font-semibold">
                 {data.location.name}, {data.location?.country}
               </h2>
               <img
-                className="w-20 mx-auto"
-                src={data.current.condition.icon}
-                alt=""
-              />
+                className="w-20 mx-auto" src={data.current.condition.icon} alt="" />
               <h1 className="text-6xl font-bold mt-4">
                 {data.current?.temp_c.toFixed()}°C
               </h1>
@@ -84,8 +85,8 @@ function App() {
               </div>
             </div>
           </>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
